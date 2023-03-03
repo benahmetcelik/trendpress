@@ -177,6 +177,7 @@ function tp_seller_ajax()
         foreach ($products as $product) {
             $id = rand(0, 99999999) . rand(0, 99999999);
             tp_create_product($id,$product, $category_id, $fligran, $spin, $publish_status, $double_spin,$commission_type,$commission_amount);
+            die();
         }
     }
 }

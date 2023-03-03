@@ -160,13 +160,34 @@ function tp_create_product($id, $product, $category_id, $fligran, $spin, $publis
     if (count($product->images) > 0) {
         if ($fligran) {
             foreach ($product->images as $image) {
-                $images[] = site_url() . '/wp-content' . tp_watermark('https://cdn.dsmcdn.com/' . $image);
+                $images[] =  site_url() . '/wp-content' .tp_watermark(tp_image_save('https://cdn.dsmcdn.com/' . $image));
             }
         } else {
             foreach ($product->images as $image) {
-                $images[] = site_url() . '/wp-content' . tp_image_save('https://cdn.dsmcdn.com/' . $image);
+                $images[] =  tp_image_save('https://cdn.dsmcdn.com/' . $image);
             }
         }
+
+
+        
+
+    }else{
+        $images = [];
+    }
+    foreach ($images as $image) {
+        $image_name = rand(1, 999999999) . '.jpg';
+
+        $image_id = wp_insert_attachment(
+            array(
+                'guid' => $image,
+                'post_mime_type' => 'image/jpeg',
+                'post_title' => $image_name,
+                'post_content' => '',
+                'post_status' => 'inherit',
+            ), $image
+        );
+        $image_ids[] = $image_id;
+
     }
     if ($spin) {
         $name = tp_spin($product->name);
@@ -202,20 +223,7 @@ function tp_create_product($id, $product, $category_id, $fligran, $spin, $publis
         $product = wc_get_product($product->ID);
 
     }
-    foreach ($images as $image) {
-        $image_name = rand(1, 999999999) . '.jpg';
-        $image_id = wp_insert_attachment(
-            array(
-                'guid' => $image,
-                'post_mime_type' => 'image/jpeg',
-                'post_title' => $image_name,
-                'post_content' => '',
-                'post_status' => 'inherit',
-            ), $image
-        );
-        $image_ids[] = $image_id;
-
-    }
+  
     @$product->set_image_id($image_ids[0]);
     $product->set_regular_price(tp_commission($commission_type,$commission_amount,$trendyol_product->price->manipulatedOriginalPrice));
     $product->save();
